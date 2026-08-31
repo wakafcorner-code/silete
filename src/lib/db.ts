@@ -48,11 +48,30 @@ export function getPool(): Pool {
 
   ensureEnvLoaded();
 
-  const host = process.env.DB_HOST || "localhost";
-  const port = parseInt(process.env.DB_PORT || "3306", 10);
-  const user = process.env.DB_USER || "root";
-  const password = process.env.DB_PASSWORD || "";
-  const database = process.env.DB_NAME || "erp_manajemen";
+  // Try to parse DATABASE_URL first if it exists
+  const dbUrl = process.env.DATABASE_URL;
+  let parsedConfig: any = {};
+
+  if (dbUrl && dbUrl.startsWith("mysql://")) {
+    try {
+      const url = new URL(dbUrl);
+      parsedConfig = {
+        host: url.hostname,
+        port: parseInt(url.port || "3306", 10),
+        user: url.username,
+        password: decodeURIComponent(url.password),
+        database: url.pathname.substring(1),
+      };
+    } catch (e) {
+      console.error("Failed to parse DATABASE_URL:", e);
+    }
+  }
+
+  const host = parsedConfig.host || process.env.DB_HOST || "localhost";
+  const port = parsedConfig.port || parseInt(process.env.DB_PORT || "3306", 10);
+  const user = parsedConfig.user || process.env.DB_USER || "root";
+  const password = parsedConfig.password || process.env.DB_PASSWORD || "";
+  const database = parsedConfig.database || process.env.DB_NAME || "erp_manajemen";
   const connectionLimit = parseInt(process.env.DB_CONNECTION_LIMIT || "10", 10);
 
   const pool = mysql.createPool({

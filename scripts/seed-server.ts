@@ -20,25 +20,42 @@ async function main() {
     const conn = await mysql.createConnection(config);
 
     try {
-        console.log("Creating default roles...");
-        await conn.execute("INSERT IGNORE INTO roles (id, name, description) VALUES (1, 'SUPER_ADMIN', 'Root access to all systems')");
+        console.log("Creating roles...");
+        const roles = [
+            [1, 'SUPER_ADMIN', 'Full Access'],
+            [2, 'ADMIN', 'Company Admin'],
+            [3, 'FINANCE_MANAGER', 'Finance Dept'],
+            [4, 'WAREHOUSE_ADMIN', 'Gudang Dept'],
+            [5, 'VIEWER', 'Read Only']
+        ];
+        for (const [id, name, desc] of roles) {
+            await conn.execute("INSERT IGNORE INTO roles (id, name, description) VALUES (?, ?, ?)", [id, name, desc]);
+        }
 
-        console.log("Creating superadmin user...");
-        const passHash = await bcrypt.hash("SuperAdmin@123456", 10);
+        console.log("Creating users...");
+        const users = [
+            [1, 'superadmin', 'admin@erp.local', 'Super@123', 'Super Administrator', 1],
+            [2, 'admin', 'store@erp.local', 'Admin@123', 'Admin Toko', 2],
+            [3, 'finance', 'finance@erp.local', 'Finance@123', 'Staf Keuangan', 3],
+            [4, 'warehouse', 'warehouse@erp.local', 'Gudang@123', 'Staf Gudang', 4],
+            [5, 'viewer', 'guest@erp.local', 'Viewer@123', 'Guest Viewer', 5],
+        ];
 
-        const [userRes] = await conn.execute(
-            "INSERT IGNORE INTO users (id, username, email, password_hash, name, status) VALUES (?, ?, ?, ?, ?, ?)",
-            [1, 'superadmin', 'admin@erp.local', passHash, 'Super Administrator', 'active']
-        );
+        for (const [id, username, email, pass, name, roleId] of users) {
+            const passHash = await bcrypt.hash(pass as string, 10);
+            await conn.execute(
+                "INSERT IGNORE INTO users (id, username, email, password_hash, name, status) VALUES (?, ?, ?, ?, ?, 'active')",
+                [id, username, email, passHash, name]
+            );
+            // Assign role
+            await conn.execute(
+                "INSERT IGNORE INTO user_roles (user_id, role_id, company_id) VALUES (?, ?, 0)",
+                [id, roleId]
+            );
+        }
 
-        console.log("Assigning role to user...");
-        await conn.execute(
-            "INSERT IGNORE INTO user_roles (user_id, role_id, company_id) VALUES (1, 1, 0)"
-        );
-
-        console.log("SUCCESS! You can now login with:");
-        console.log("User: superadmin");
-        console.log("Pass: SuperAdmin@123456");
+        console.log("SUCCESS! All accounts created.");
+        console.log("Default Password for all: [RoleName]@123 (e.g. Admin@123)");
 
     } catch (err) {
         console.error("FAILED:", err);

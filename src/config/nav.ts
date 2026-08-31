@@ -275,10 +275,22 @@ export const NAVIGATION_SECTIONS: NavSection[] = [
     title: "Pengaturan & Sistem",
     items: [
       {
-        title: "Manajemen Perusahaan",
-        href: "/dashboard/admin/companies",
+        title: "Manajemen Sistem",
+        href: "/dashboard/admin",
         icon: "Briefcase",
         requiredPermission: ["company.manage"],
+        children: [
+          {
+            title: "Daftar Perusahaan",
+            href: "/dashboard/admin/companies",
+            requiredPermission: ["company.manage"],
+          },
+          {
+            title: "Manajemen Pengguna",
+            href: "/dashboard/admin/users",
+            requiredPermission: ["company.manage"],
+          },
+        ],
       },
       {
         title: "Jejak Audit (Audit Log)",
