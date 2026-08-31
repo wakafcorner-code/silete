@@ -173,10 +173,11 @@ export async function middleware(req: NextRequest) {
 
         if (!hasAccess) {
           // Redirect to a "403 Forbidden" page or back to dashboard with error
-          const forbiddenUrl = new URL("/dashboard", req.url);
-          forbiddenUrl.searchParams.set("error", "forbidden");
-          forbiddenUrl.searchParams.set("from", pathname);
-          return NextResponse.redirect(forbiddenUrl);
+          const url = req.nextUrl.clone();
+          url.pathname = "/login"; // Force back to login for now or dashboard with error
+          url.searchParams.set("error", "forbidden");
+          url.searchParams.set("from", pathname);
+          return NextResponse.redirect(url);
         }
       }
     }
