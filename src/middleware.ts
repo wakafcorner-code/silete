@@ -144,15 +144,18 @@ export async function middleware(req: NextRequest) {
 
   // ─── 1. Login redirect if already authenticated ───────────────────────────
   if (pathname === "/login" && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
   }
 
   // ─── 2. Dashboard routes require authentication ───────────────────────────
   if (pathname.startsWith("/dashboard")) {
     if (!isAuthenticated) {
-      const loginUrl = new URL("/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
     }
 
     // SUPER_ADMIN bypasses all permission checks
