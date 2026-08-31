@@ -88,10 +88,10 @@ export default function SalesOrdersPage() {
       });
 
       const [oRes, cRes, bRes, pRes] = await Promise.all([
-        fetch(`/api/sales/orders?${queryParams.toString()}`),
-        fetch("api/customers?limit=100"),
-        fetch("api/branches"),
-        fetch("api/products?limit=100"),
+        fetch(`/silete/api/sales/orders?${queryParams.toString()}`),
+        fetch("/silete/api/customers?limit=100"),
+        fetch("/silete/api/branches"),
+        fetch("/silete/api/products?limit=100"),
       ]);
 
       const oData = await oRes.json();
@@ -210,7 +210,7 @@ export default function SalesOrdersPage() {
         })),
       };
 
-      const res = await fetch("api/sales/orders", {
+      const res = await fetch("/silete/api/sales/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -231,7 +231,7 @@ export default function SalesOrdersPage() {
   const handleConfirm = async (id: number) => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/sales/orders/${id}/confirm`, {
+      const res = await fetch(`/silete/api/sales/orders/${id}/confirm`, {
         method: "POST",
       });
       const data = await res.json();

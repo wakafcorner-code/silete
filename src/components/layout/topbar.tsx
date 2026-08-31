@@ -17,7 +17,7 @@ export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
   useEffect(() => {
     async function loadUser() {
       try {
-        const res = await fetch("api/auth/me");
+        const res = await fetch("/silete/api/auth/me");
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.user) {
@@ -34,7 +34,7 @@ export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      await fetch("api/auth/logout", { method: "POST" });
+      await fetch("/silete/api/auth/logout", { method: "POST" });
       router.push("/login");
       router.refresh();
     } catch (err) {

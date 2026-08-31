@@ -101,7 +101,7 @@ export function SupplierInvoiceDialog({
   const pullSpecificPo = async (id: string) => {
     setLoadingPo(true);
     try {
-      const res = await fetch(`/api/purchasing/orders/${id}`);
+      const res = await fetch(`/silete/api/purchasing/orders/${id}`);
       const data = await res.json();
       if (data.success && data.order) {
         const po = data.order;
@@ -131,7 +131,7 @@ export function SupplierInvoiceDialog({
   const pullSpecificGrn = async (id: string) => {
     setLoadingGrn(true);
     try {
-      const res = await fetch(`/api/inventory/receiving/${id}`);
+      const res = await fetch(`/silete/api/inventory/receiving/${id}`);
       const data = await res.json();
       if (data.success && data.receipt) {
         const grn = data.receipt;
@@ -160,7 +160,7 @@ export function SupplierInvoiceDialog({
 
   const fetchSuppliers = async () => {
     try {
-      const res = await fetch("api/suppliers?limit=100");
+      const res = await fetch("/silete/api/suppliers?limit=100");
       const data = await res.json();
       if (data.success) setSuppliers(data.data || []);
     } catch (err) {
@@ -171,7 +171,7 @@ export function SupplierInvoiceDialog({
   const fetchGrns = async () => {
     setLoadingGrn(true);
     try {
-      const res = await fetch("api/inventory/receiving?status=posted&limit=50");
+      const res = await fetch("/silete/api/inventory/receiving?status=posted&limit=50");
       const data = await res.json();
       if (data.success) setGrns(data.data || []);
     } catch (err) {
@@ -184,7 +184,7 @@ export function SupplierInvoiceDialog({
   const fetchPos = async () => {
     setLoadingPo(true);
     try {
-      const res = await fetch("api/purchasing/orders?status=approved&limit=50");
+      const res = await fetch("/silete/api/purchasing/orders?status=approved&limit=50");
       const data = await res.json();
       if (data.success) setPos(data.data || []);
     } catch (err) {
@@ -196,7 +196,7 @@ export function SupplierInvoiceDialog({
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("api/products?limit=100");
+      const res = await fetch("/silete/api/products?limit=100");
       const data = await res.json();
       if (data.success) setProducts(data.data || []);
     } catch (err) {
@@ -208,7 +208,7 @@ export function SupplierInvoiceDialog({
     if (!selectedGrnId) return;
     setLoadingGrn(true);
     try {
-      const res = await fetch(`/api/inventory/receiving/${selectedGrnId}`);
+      const res = await fetch(`/silete/api/inventory/receiving/${selectedGrnId}`);
       const data = await res.json();
       if (data.success && data.receipt) {
         const grn = data.receipt;
@@ -241,7 +241,7 @@ export function SupplierInvoiceDialog({
     if (!selectedPoId) return;
     setLoadingPo(true);
     try {
-      const res = await fetch(`/api/purchasing/orders/${selectedPoId}`);
+      const res = await fetch(`/silete/api/purchasing/orders/${selectedPoId}`);
       const data = await res.json();
       if (data.success && data.order) {
         const po = data.order;
@@ -273,7 +273,7 @@ export function SupplierInvoiceDialog({
     if (!form.invoice_no) return toast("error", "Nomor faktur wajib diisi");
     setSaving(true);
     try {
-      const res = await fetch("api/purchasing/invoices", {
+      const res = await fetch("/silete/api/purchasing/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

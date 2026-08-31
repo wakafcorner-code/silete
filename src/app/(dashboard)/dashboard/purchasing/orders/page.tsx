@@ -93,10 +93,10 @@ export default function PurchaseOrdersPage() {
       });
 
       const [oRes, sRes, bRes, pRes] = await Promise.all([
-        fetch(`/api/purchasing/orders?${queryParams.toString()}`),
-        fetch("api/suppliers?limit=100"),
-        fetch("api/branches"),
-        fetch("api/products?limit=100"),
+        fetch(`/silete/api/purchasing/orders?${queryParams.toString()}`),
+        fetch("/silete/api/suppliers?limit=100"),
+        fetch("/silete/api/branches"),
+        fetch("/silete/api/products?limit=100"),
       ]);
 
       const oData = await oRes.json();
@@ -217,7 +217,7 @@ export default function PurchaseOrdersPage() {
         })),
       };
 
-      const res = await fetch("api/purchasing/orders", {
+      const res = await fetch("/silete/api/purchasing/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -238,7 +238,7 @@ export default function PurchaseOrdersPage() {
   const handleApprove = async (id: number) => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/purchasing/orders/${id}/approve`, {
+      const res = await fetch(`/silete/api/purchasing/orders/${id}/approve`, {
         method: "POST",
       });
       const data = await res.json();

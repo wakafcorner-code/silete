@@ -40,7 +40,7 @@ export default function SupplierInvoicesClient({ initialData }: { initialData: a
   const refreshData = async () => {
     setLoading(true);
     try {
-      const res = await fetch("api/purchasing/invoices?limit=50");
+      const res = await fetch("/silete/api/purchasing/invoices?limit=50");
       const data = await res.json();
       if (data.success) setInvoices(data.data || []);
     } finally {

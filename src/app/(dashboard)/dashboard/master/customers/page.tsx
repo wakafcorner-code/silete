@@ -44,7 +44,7 @@ export default function CustomersPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/customers?limit=100&search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/silete/api/customers?limit=100&search=${encodeURIComponent(search)}`);
       const data = await res.json();
       if (data.success) setCustomers(data.data || []);
     } catch {
@@ -101,7 +101,7 @@ export default function CustomersPage() {
         credit_limit: Number(form.credit_limit),
         status: form.status,
       };
-      const url = editingId ? `/api/customers/${editingId}` : "/api/customers";
+      const url = editingId ? `/silete/api/customers/${editingId}` : "/silete/api/customers";
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();

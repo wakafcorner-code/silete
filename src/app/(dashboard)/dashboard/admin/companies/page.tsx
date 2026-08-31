@@ -49,7 +49,7 @@ export default function CompaniesPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("api/companies");
+      const res = await fetch("/silete/api/companies");
       const data = await res.json();
       if (data.success) {
         setCompanies(data.companies || []);
@@ -106,7 +106,7 @@ export default function CompaniesPage() {
         status: form.status,
       };
 
-      const res = await fetch("api/companies", {
+      const res = await fetch("/silete/api/companies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

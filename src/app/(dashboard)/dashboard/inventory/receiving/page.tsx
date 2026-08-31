@@ -68,9 +68,9 @@ export default function GoodsReceiptsPage() {
     setLoading(true);
     try {
       const [rRes, wRes, pRes] = await Promise.all([
-        fetch("api/inventory/receiving?limit=100"),
-        fetch("api/warehouses"),
-        fetch("api/products?limit=100"),
+        fetch("/silete/api/inventory/receiving?limit=100"),
+        fetch("/silete/api/warehouses"),
+        fetch("/silete/api/products?limit=100"),
       ]);
 
       const rData = await rRes.json();
@@ -168,7 +168,7 @@ export default function GoodsReceiptsPage() {
         })),
       };
 
-      const res = await fetch("api/inventory/receiving", {
+      const res = await fetch("/silete/api/inventory/receiving", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -189,7 +189,7 @@ export default function GoodsReceiptsPage() {
   const handlePost = async (id: number) => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/inventory/receiving/${id}/post`, {
+      const res = await fetch(`/silete/api/inventory/receiving/${id}/post`, {
         method: "POST",
       });
       const data = await res.json();

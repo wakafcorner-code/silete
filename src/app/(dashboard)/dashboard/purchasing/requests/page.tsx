@@ -59,8 +59,8 @@ export default function PurchaseRequestsPage() {
       });
 
       const [rRes, bRes] = await Promise.all([
-        fetch(`/api/purchasing/requests?${queryParams.toString()}`),
-        fetch("api/branches"),
+        fetch(`/silete/api/purchasing/requests?${queryParams.toString()}`),
+        fetch("/silete/api/branches"),
       ]);
       const rData = await rRes.json();
       const bData = await bRes.json();
@@ -108,7 +108,7 @@ export default function PurchaseRequestsPage() {
         notes: form.notes.trim() || null,
       };
 
-      const res = await fetch("api/purchasing/requests", {
+      const res = await fetch("/silete/api/purchasing/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -129,7 +129,7 @@ export default function PurchaseRequestsPage() {
   const handleAction = async (id: number, action: "submit" | "approve" | "reject") => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/purchasing/requests/${id}/${action}`, {
+      const res = await fetch(`/silete/api/purchasing/requests/${id}/${action}`, {
         method: "POST",
       });
       const data = await res.json();

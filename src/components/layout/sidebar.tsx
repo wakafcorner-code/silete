@@ -87,7 +87,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
   useEffect(() => {
     async function fetchActiveCompany() {
       try {
-        const res = await fetch("api/companies/active");
+        const res = await fetch("/silete/api/companies/active");
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.company) {

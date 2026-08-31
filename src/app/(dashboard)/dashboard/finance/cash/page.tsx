@@ -69,8 +69,8 @@ export default function CashPage() {
     setLoading(true);
     try {
       const [aRes, tRes] = await Promise.all([
-        fetch("api/finance/cash-accounts"),
-        fetch("api/finance/cash-transactions?limit=50"),
+        fetch("/silete/api/finance/cash-accounts"),
+        fetch("/silete/api/finance/cash-transactions?limit=50"),
       ]);
 
       const aData = await aRes.json();
@@ -105,7 +105,7 @@ export default function CashPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("api/finance/cash-accounts", {
+      const res = await fetch("/silete/api/finance/cash-accounts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -138,7 +138,7 @@ export default function CashPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("api/finance/cash-transactions", {
+      const res = await fetch("/silete/api/finance/cash-transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

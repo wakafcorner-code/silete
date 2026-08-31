@@ -44,7 +44,7 @@ export default function SuppliersPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/suppliers?limit=100&search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/silete/api/suppliers?limit=100&search=${encodeURIComponent(search)}`);
       const data = await res.json();
       if (data.success) setSuppliers(data.data || []);
     } catch {
@@ -101,7 +101,7 @@ export default function SuppliersPage() {
         payment_terms_days: Number(form.payment_terms_days),
         status: form.status,
       };
-      const url = editingId ? `/api/suppliers/${editingId}` : "/api/suppliers";
+      const url = editingId ? `/silete/api/suppliers/${editingId}` : "/silete/api/suppliers";
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();

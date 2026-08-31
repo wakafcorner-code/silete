@@ -45,8 +45,8 @@ export default function WarehousesMasterPage() {
     setLoading(true);
     try {
       const [whRes, brRes] = await Promise.all([
-        fetch("api/warehouses"),
-        fetch("api/branches"),
+        fetch("/silete/api/warehouses"),
+        fetch("/silete/api/branches"),
       ]);
       const whData = await whRes.json();
       const brData = await brRes.json();
@@ -101,7 +101,7 @@ export default function WarehousesMasterPage() {
         status: form.status,
       };
 
-      const url = editingId ? `/api/warehouses/${editingId}` : "/api/warehouses";
+      const url = editingId ? `/silete/api/warehouses/${editingId}` : "/silete/api/warehouses";
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, {
         method,

@@ -98,11 +98,11 @@ export default function ExpensesPage() {
       });
 
       const [eRes, cRes, bRes, cashRes, bankRes] = await Promise.all([
-        fetch(`/api/expenses?${queryParams.toString()}`),
-        fetch("api/expenses/categories"),
-        fetch("api/branches"),
-        fetch("api/finance/cash-accounts"),
-        fetch("api/finance/bank-accounts"),
+        fetch(`/silete/api/expenses?${queryParams.toString()}`),
+        fetch("/silete/api/expenses/categories"),
+        fetch("/silete/api/branches"),
+        fetch("/silete/api/finance/cash-accounts"),
+        fetch("/silete/api/finance/bank-accounts"),
       ]);
 
       const eData = await eRes.json();
@@ -174,7 +174,7 @@ export default function ExpensesPage() {
         amount: Number(form.amount),
       };
 
-      const res = await fetch("api/expenses", {
+      const res = await fetch("/silete/api/expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -187,7 +187,7 @@ export default function ExpensesPage() {
         evidence.append("file", evidenceFile);
         evidence.append("reference_type", "expense");
         evidence.append("reference_id", String(data.data.id));
-        const uploadRes = await fetch("api/attachments", { method: "POST", body: evidence });
+        const uploadRes = await fetch("/silete/api/attachments", { method: "POST", body: evidence });
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok) throw new Error(uploadData.error || "Gagal mengunggah bukti transaksi");
       }
@@ -206,7 +206,7 @@ export default function ExpensesPage() {
   const handleAction = async (id: number, action: "submit" | "approve" | "reject") => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/expenses/${id}/${action}`, {
+      const res = await fetch(`/silete/api/expenses/${id}/${action}`, {
         method: "POST",
       });
       const data = await res.json();
@@ -235,7 +235,7 @@ export default function ExpensesPage() {
         payment_date: payForm.payment_date,
       };
 
-      const res = await fetch(`/api/expenses/${selectedExpense.id}/pay`, {
+      const res = await fetch(`/silete/api/expenses/${selectedExpense.id}/pay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

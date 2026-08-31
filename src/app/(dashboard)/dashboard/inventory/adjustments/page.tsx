@@ -65,9 +65,9 @@ export default function StockAdjustmentsPage() {
     setLoading(true);
     try {
       const [aRes, wRes, pRes] = await Promise.all([
-        fetch("api/inventory/adjustments?limit=100"),
-        fetch("api/warehouses"),
-        fetch("api/products?limit=100"),
+        fetch("/silete/api/inventory/adjustments?limit=100"),
+        fetch("/silete/api/warehouses"),
+        fetch("/silete/api/products?limit=100"),
       ]);
 
       const aData = await aRes.json();
@@ -126,7 +126,7 @@ export default function StockAdjustmentsPage() {
         adjustment_date: form.adjustment_date,
       };
 
-      const res = await fetch("api/inventory/adjustments", {
+      const res = await fetch("/silete/api/inventory/adjustments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -147,7 +147,7 @@ export default function StockAdjustmentsPage() {
   const handlePost = async (id: number) => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/inventory/adjustments/${id}/post`, {
+      const res = await fetch(`/silete/api/inventory/adjustments/${id}/post`, {
         method: "POST",
       });
       const data = await res.json();

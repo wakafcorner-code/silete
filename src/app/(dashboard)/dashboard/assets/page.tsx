@@ -69,8 +69,8 @@ export default function AssetsPage() {
     setLoading(true);
     try {
       const [aRes, cRes] = await Promise.all([
-        fetch("api/assets?limit=100"),
-        fetch("api/assets/categories"),
+        fetch("/silete/api/assets?limit=100"),
+        fetch("/silete/api/assets/categories"),
       ]);
 
       const aData = await aRes.json();
@@ -130,7 +130,7 @@ export default function AssetsPage() {
         post_acquisition_journal: true,
       };
 
-      const res = await fetch("api/assets", {
+      const res = await fetch("/silete/api/assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -151,7 +151,7 @@ export default function AssetsPage() {
   const handleDepreciate = async (id: number) => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/assets/${id}/depreciate`, {
+      const res = await fetch(`/silete/api/assets/${id}/depreciate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ depreciation_date: today }),
@@ -172,7 +172,7 @@ export default function AssetsPage() {
     if (!selectedAsset) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/assets/${selectedAsset.id}/dispose`, {
+      const res = await fetch(`/silete/api/assets/${selectedAsset.id}/dispose`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -90,11 +90,11 @@ export default function PurchasingReceiptsPage() {
     setLoading(true);
     try {
       const [rRes, wRes, sRes, poRes, pRes] = await Promise.all([
-        fetch("api/inventory/receiving?limit=100"),
-        fetch("api/warehouses"),
-        fetch("api/suppliers?limit=100"),
-        fetch("api/purchasing/orders?limit=100"),
-        fetch("api/products?limit=100"),
+        fetch("/silete/api/inventory/receiving?limit=100"),
+        fetch("/silete/api/warehouses"),
+        fetch("/silete/api/suppliers?limit=100"),
+        fetch("/silete/api/purchasing/orders?limit=100"),
+        fetch("/silete/api/products?limit=100"),
       ]);
 
       const rData = await rRes.json();
@@ -192,7 +192,7 @@ export default function PurchasingReceiptsPage() {
         })),
       };
 
-      const res = await fetch("api/inventory/receiving", {
+      const res = await fetch("/silete/api/inventory/receiving", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -214,7 +214,7 @@ export default function PurchasingReceiptsPage() {
   const handlePost = async (id: number) => {
     setActionLoadingId(id);
     try {
-      const res = await fetch(`/api/inventory/receiving/${id}/post`, {
+      const res = await fetch(`/silete/api/inventory/receiving/${id}/post`, {
         method: "POST",
       });
       const data = await res.json();
@@ -234,8 +234,8 @@ export default function PurchasingReceiptsPage() {
     setDetailOpen(true);
     try {
       const [res, attRes] = await Promise.all([
-        fetch(`/api/inventory/receiving/${id}`),
-        fetch(`/api/attachments?reference_type=goods_receipt&reference_id=${id}`)
+        fetch(`/silete/api/inventory/receiving/${id}`),
+        fetch(`/silete/api/attachments?reference_type=goods_receipt&reference_id=${id}`)
       ]);
       const data = await res.json();
       const attData = await attRes.json();

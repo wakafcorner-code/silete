@@ -49,8 +49,8 @@ export default function StockBalancesPage() {
       });
 
       const [sRes, wRes] = await Promise.all([
-        fetch(`/api/inventory/stock-balances?${queryParams.toString()}`),
-        fetch("api/warehouses"),
+        fetch(`/silete/api/inventory/stock-balances?${queryParams.toString()}`),
+        fetch("/silete/api/warehouses"),
       ]);
 
       const sData = await sRes.json();

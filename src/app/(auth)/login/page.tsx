@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       // Use relative path to respect basePath /silete
-      const res = await fetch("api/auth/login", {
+      const res = await fetch("/silete/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier, password }),
