@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  basePath: '/silete',
+  // Ensure that all assets and links are prefixed with /silete
 };
 
 export default nextConfig;

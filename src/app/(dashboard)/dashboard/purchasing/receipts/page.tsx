@@ -12,7 +12,7 @@ import { Dialog, DialogHeader, DialogFooter, FormField } from "@/components/ui/d
 import { useToast } from "@/components/ui/toast";
 import { ExportButtons } from "@/components/ui/export-buttons";
 import { ArrowDownLeft, CheckCircle, Plus, Trash2, Loader2, RefreshCw, Search, Eye, FileIcon, ImageIcon, FileText } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getPublicPath } from "@/lib/utils";
 import Link from "next/link";
 
 interface GoodsReceipt {
@@ -684,7 +684,7 @@ export default function PurchasingReceiptsPage() {
                         className="group relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200 hover:border-indigo-500 transition-all shadow-sm"
                       >
                         {isImage ? (
-                          <img src={att.file_path} alt={att.file_name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                          <img src={getPublicPath(att.file_path)} alt={att.file_name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center">
                             <FileIcon className="w-6 h-6 text-slate-400 mb-1" />
@@ -710,7 +710,7 @@ export default function PurchasingReceiptsPage() {
           </div>
         ) : null}
 
-        <DialogFooter className="mt-6 border-t pt-4">
+        <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setDetailOpen(false)}>Tutup</Button>
           {selectedReceipt?.receipt.status === 'posted' && (
             <Button size="sm" className="bg-indigo-600">Export PDF Dokumen</Button>

@@ -4,6 +4,7 @@ import { listDocumentationAttachments } from "@/services/attachment-service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UploadDocumentationForm } from "./upload-form";
+import { getPublicPath } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function DocumentationPage() {
                 <Card key={doc.id} className="overflow-hidden group hover:shadow-md transition-shadow">
                   <div className="relative aspect-square bg-slate-100 border-b overflow-hidden">
                     <img
-                      src={doc.file_path}
+                      src={getPublicPath(doc.file_path)}
                       alt={doc.file_name}
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />

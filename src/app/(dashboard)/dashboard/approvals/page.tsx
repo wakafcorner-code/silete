@@ -13,9 +13,8 @@ export default async function ApprovalsPage() {
   const session = await getServerSession();
 
   // Fetch pending items across modules
-  const [pos, deliveries] = await Promise.all([
+  const [pos] = await Promise.all([
     listPurchaseOrders(session, { status: "submitted", limit: 10 }),
-    // listDeliveries(session, { status: "draft", limit: 10 }), // If we want to approve draft deliveries
   ]);
 
   const pendingCount = (pos.data?.length || 0);

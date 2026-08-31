@@ -51,3 +51,17 @@ export function formatDateTime(date: Date | string | null | undefined): string {
     minute: "2-digit",
   }).format(d);
 }
+
+/**
+ * Prefix a public asset path with the application base path if necessary.
+ */
+export function getPublicPath(path: string): string {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+
+  const basePath = "/silete"; // This should match next.config.ts
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (cleanPath.startsWith(basePath)) return cleanPath;
+  return `${basePath}${cleanPath}`;
+}

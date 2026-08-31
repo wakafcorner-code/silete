@@ -21,7 +21,7 @@ import {
   getInventoryCompositionData
 } from "@/services/report-service";
 import { listDocumentationAttachments } from "@/services/attachment-service";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getPublicPath } from "@/lib/utils";
 import { Camera, ArrowRight, PlusCircle, FilePlus, UserPlus } from "lucide-react";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import Link from "next/link";
@@ -202,7 +202,7 @@ export default async function DashboardPage() {
                 {displayDocs.map((doc) => (
                   <div key={doc.id} className="group relative aspect-video bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                     <img
-                      src={doc.file_path}
+                      src={getPublicPath(doc.file_path)}
                       alt={doc.file_name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
