@@ -63,7 +63,7 @@ export default function ProductsPage() {
     try {
       const [pRes, cRes] = await Promise.all([
         fetch(`/api/products?limit=100&search=${encodeURIComponent(search)}`),
-        fetch("/api/product-categories?limit=200"),
+        fetch("api/product-categories?limit=200"),
       ]);
       const pData = await pRes.json();
       const cData = await cRes.json();
@@ -125,7 +125,7 @@ export default function ProductsPage() {
       // If user typed a new category, create it first
       if (form.use_new_category && form.category_new.trim()) {
         const catCode = `CAT-${Date.now().toString().slice(-6)}`;
-        const catRes = await fetch("/api/product-categories", {
+        const catRes = await fetch("api/product-categories", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -45,8 +45,8 @@ export default function WarehousesMasterPage() {
     setLoading(true);
     try {
       const [whRes, brRes] = await Promise.all([
-        fetch("/api/warehouses"),
-        fetch("/api/branches"),
+        fetch("api/warehouses"),
+        fetch("api/branches"),
       ]);
       const whData = await whRes.json();
       const brData = await brRes.json();

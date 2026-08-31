@@ -65,9 +65,9 @@ export default function StockAdjustmentsPage() {
     setLoading(true);
     try {
       const [aRes, wRes, pRes] = await Promise.all([
-        fetch("/api/inventory/adjustments?limit=100"),
-        fetch("/api/warehouses"),
-        fetch("/api/products?limit=100"),
+        fetch("api/inventory/adjustments?limit=100"),
+        fetch("api/warehouses"),
+        fetch("api/products?limit=100"),
       ]);
 
       const aData = await aRes.json();
@@ -126,7 +126,7 @@ export default function StockAdjustmentsPage() {
         adjustment_date: form.adjustment_date,
       };
 
-      const res = await fetch("/api/inventory/adjustments", {
+      const res = await fetch("api/inventory/adjustments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

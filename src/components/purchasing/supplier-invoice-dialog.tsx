@@ -160,7 +160,7 @@ export function SupplierInvoiceDialog({
 
   const fetchSuppliers = async () => {
     try {
-      const res = await fetch("/api/suppliers?limit=100");
+      const res = await fetch("api/suppliers?limit=100");
       const data = await res.json();
       if (data.success) setSuppliers(data.data || []);
     } catch (err) {
@@ -171,7 +171,7 @@ export function SupplierInvoiceDialog({
   const fetchGrns = async () => {
     setLoadingGrn(true);
     try {
-      const res = await fetch("/api/inventory/receiving?status=posted&limit=50");
+      const res = await fetch("api/inventory/receiving?status=posted&limit=50");
       const data = await res.json();
       if (data.success) setGrns(data.data || []);
     } catch (err) {
@@ -184,7 +184,7 @@ export function SupplierInvoiceDialog({
   const fetchPos = async () => {
     setLoadingPo(true);
     try {
-      const res = await fetch("/api/purchasing/orders?status=approved&limit=50");
+      const res = await fetch("api/purchasing/orders?status=approved&limit=50");
       const data = await res.json();
       if (data.success) setPos(data.data || []);
     } catch (err) {
@@ -196,7 +196,7 @@ export function SupplierInvoiceDialog({
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("/api/products?limit=100");
+      const res = await fetch("api/products?limit=100");
       const data = await res.json();
       if (data.success) setProducts(data.data || []);
     } catch (err) {
@@ -273,7 +273,7 @@ export function SupplierInvoiceDialog({
     if (!form.invoice_no) return toast("error", "Nomor faktur wajib diisi");
     setSaving(true);
     try {
-      const res = await fetch("/api/purchasing/invoices", {
+      const res = await fetch("api/purchasing/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

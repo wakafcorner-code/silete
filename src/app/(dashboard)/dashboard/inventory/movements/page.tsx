@@ -55,7 +55,7 @@ export default function MovementsPage() {
 
       const [mRes, wRes] = await Promise.all([
         fetch(`/api/inventory/movements?${queryParams.toString()}`),
-        fetch("/api/warehouses"),
+        fetch("api/warehouses"),
       ]);
 
       const mData = await mRes.json();

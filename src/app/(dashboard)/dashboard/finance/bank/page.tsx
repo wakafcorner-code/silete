@@ -73,8 +73,8 @@ export default function BankPage() {
     setLoading(true);
     try {
       const [aRes, tRes] = await Promise.all([
-        fetch("/api/finance/bank-accounts"),
-        fetch("/api/finance/bank-transactions?limit=50"),
+        fetch("api/finance/bank-accounts"),
+        fetch("api/finance/bank-transactions?limit=50"),
       ]);
 
       const aData = await aRes.json();
@@ -110,7 +110,7 @@ export default function BankPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/finance/bank-accounts", {
+      const res = await fetch("api/finance/bank-accounts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -145,7 +145,7 @@ export default function BankPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/finance/bank-transactions", {
+      const res = await fetch("api/finance/bank-transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

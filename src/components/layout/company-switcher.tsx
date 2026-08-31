@@ -16,8 +16,8 @@ export function CompanySwitcher() {
     async function loadData() {
       try {
         const [compRes, activeRes] = await Promise.all([
-          fetch("/api/companies"),
-          fetch("/api/companies/active"),
+          fetch("api/companies"),
+          fetch("api/companies/active"),
         ]);
 
         if (compRes.ok) {
@@ -48,7 +48,7 @@ export function CompanySwitcher() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/companies/active", {
+      const res = await fetch("api/companies/active", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ companyId: company.id }),

@@ -15,7 +15,7 @@ export function useSession() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/auth/me");
+        const res = await fetch("api/auth/me");
         if (res.ok) {
           const data = await res.json();
           if (!cancelled && data.success && data.user) {

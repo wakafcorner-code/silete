@@ -66,9 +66,9 @@ export default function PaymentsPage() {
     setLoading(true);
     try {
       const [pRes, cRes, bRes] = await Promise.all([
-        fetch("/api/payments?limit=100"),
-        fetch("/api/finance/cash-accounts"),
-        fetch("/api/finance/bank-accounts"),
+        fetch("api/payments?limit=100"),
+        fetch("api/finance/cash-accounts"),
+        fetch("api/finance/bank-accounts"),
       ]);
 
       const pData = await pRes.json();
@@ -128,7 +128,7 @@ export default function PaymentsPage() {
         notes: form.notes.trim() || null,
       };
 
-      const res = await fetch("/api/payments", {
+      const res = await fetch("api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

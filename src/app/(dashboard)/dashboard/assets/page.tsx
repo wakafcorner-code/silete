@@ -69,8 +69,8 @@ export default function AssetsPage() {
     setLoading(true);
     try {
       const [aRes, cRes] = await Promise.all([
-        fetch("/api/assets?limit=100"),
-        fetch("/api/assets/categories"),
+        fetch("api/assets?limit=100"),
+        fetch("api/assets/categories"),
       ]);
 
       const aData = await aRes.json();
@@ -130,7 +130,7 @@ export default function AssetsPage() {
         post_acquisition_journal: true,
       };
 
-      const res = await fetch("/api/assets", {
+      const res = await fetch("api/assets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

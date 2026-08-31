@@ -60,9 +60,9 @@ export default function TransfersPage() {
     setLoading(true);
     try {
       const [tRes, wRes, pRes] = await Promise.all([
-        fetch("/api/inventory/transfers?limit=50"),
-        fetch("/api/warehouses"),
-        fetch("/api/products?limit=100"),
+        fetch("api/inventory/transfers?limit=50"),
+        fetch("api/warehouses"),
+        fetch("api/products?limit=100"),
       ]);
 
       const tData = await tRes.json();
@@ -120,7 +120,7 @@ export default function TransfersPage() {
         notes: form.notes.trim() || null,
       };
 
-      const res = await fetch("/api/inventory/transfers", {
+      const res = await fetch("api/inventory/transfers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

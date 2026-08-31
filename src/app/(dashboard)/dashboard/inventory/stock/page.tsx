@@ -50,7 +50,7 @@ export default function StockBalancesPage() {
 
       const [sRes, wRes] = await Promise.all([
         fetch(`/api/inventory/stock-balances?${queryParams.toString()}`),
-        fetch("/api/warehouses"),
+        fetch("api/warehouses"),
       ]);
 
       const sData = await sRes.json();

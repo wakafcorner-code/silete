@@ -90,11 +90,11 @@ export default function PurchasingReceiptsPage() {
     setLoading(true);
     try {
       const [rRes, wRes, sRes, poRes, pRes] = await Promise.all([
-        fetch("/api/inventory/receiving?limit=100"),
-        fetch("/api/warehouses"),
-        fetch("/api/suppliers?limit=100"),
-        fetch("/api/purchasing/orders?limit=100"),
-        fetch("/api/products?limit=100"),
+        fetch("api/inventory/receiving?limit=100"),
+        fetch("api/warehouses"),
+        fetch("api/suppliers?limit=100"),
+        fetch("api/purchasing/orders?limit=100"),
+        fetch("api/products?limit=100"),
       ]);
 
       const rData = await rRes.json();
@@ -192,7 +192,7 @@ export default function PurchasingReceiptsPage() {
         })),
       };
 
-      const res = await fetch("/api/inventory/receiving", {
+      const res = await fetch("api/inventory/receiving", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

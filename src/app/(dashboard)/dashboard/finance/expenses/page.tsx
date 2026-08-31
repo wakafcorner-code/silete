@@ -99,10 +99,10 @@ export default function ExpensesPage() {
 
       const [eRes, cRes, bRes, cashRes, bankRes] = await Promise.all([
         fetch(`/api/expenses?${queryParams.toString()}`),
-        fetch("/api/expenses/categories"),
-        fetch("/api/branches"),
-        fetch("/api/finance/cash-accounts"),
-        fetch("/api/finance/bank-accounts"),
+        fetch("api/expenses/categories"),
+        fetch("api/branches"),
+        fetch("api/finance/cash-accounts"),
+        fetch("api/finance/bank-accounts"),
       ]);
 
       const eData = await eRes.json();
@@ -174,7 +174,7 @@ export default function ExpensesPage() {
         amount: Number(form.amount),
       };
 
-      const res = await fetch("/api/expenses", {
+      const res = await fetch("api/expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -187,7 +187,7 @@ export default function ExpensesPage() {
         evidence.append("file", evidenceFile);
         evidence.append("reference_type", "expense");
         evidence.append("reference_id", String(data.data.id));
-        const uploadRes = await fetch("/api/attachments", { method: "POST", body: evidence });
+        const uploadRes = await fetch("api/attachments", { method: "POST", body: evidence });
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok) throw new Error(uploadData.error || "Gagal mengunggah bukti transaksi");
       }

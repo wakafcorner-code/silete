@@ -89,9 +89,9 @@ export default function SalesOrdersPage() {
 
       const [oRes, cRes, bRes, pRes] = await Promise.all([
         fetch(`/api/sales/orders?${queryParams.toString()}`),
-        fetch("/api/customers?limit=100"),
-        fetch("/api/branches"),
-        fetch("/api/products?limit=100"),
+        fetch("api/customers?limit=100"),
+        fetch("api/branches"),
+        fetch("api/products?limit=100"),
       ]);
 
       const oData = await oRes.json();
@@ -210,7 +210,7 @@ export default function SalesOrdersPage() {
         })),
       };
 
-      const res = await fetch("/api/sales/orders", {
+      const res = await fetch("api/sales/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

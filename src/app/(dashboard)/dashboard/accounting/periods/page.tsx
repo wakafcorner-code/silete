@@ -40,7 +40,7 @@ export default function FinancialPeriodsPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/accounting/financial-periods");
+      const res = await fetch("api/accounting/financial-periods");
       const data = await res.json();
       if (data.data) setPeriods(data.data);
     } catch {
@@ -79,7 +79,7 @@ export default function FinancialPeriodsPage() {
     if (!validate()) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/accounting/financial-periods", {
+      const res = await fetch("api/accounting/financial-periods", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
