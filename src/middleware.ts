@@ -144,23 +144,19 @@ export async function middleware(req: NextRequest) {
 
   // ─── 1. Login redirect if already authenticated ───────────────────────────
   if (pathname === "/login" && isAuthenticated) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL("/silete/dashboard", req.url));
   }
 
   // ─── 2. Dashboard routes require authentication ───────────────────────────
   if (pathname.startsWith("/dashboard")) {
     if (!isAuthenticated) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(url);
+      const loginUrl = new URL("/silete/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
     }
 
     // SUPER_ADMIN bypasses all permission checks
     if (!payload?.roles?.includes("SUPER_ADMIN")) {
-      // Find the most specific matching route rule
       const matchedRule = ROUTE_PERMISSION_MAP.find((rule) =>
         pathname.startsWith(rule.prefix)
       );
@@ -172,12 +168,7 @@ export async function middleware(req: NextRequest) {
         );
 
         if (!hasAccess) {
-          // Redirect to a "403 Forbidden" page or back to dashboard with error
-          const url = req.nextUrl.clone();
-          url.pathname = "/login"; // Force back to login for now or dashboard with error
-          url.searchParams.set("error", "forbidden");
-          url.searchParams.set("from", pathname);
-          return NextResponse.redirect(url);
+          return NextResponse.redirect(new URL("/silete/login?error=forbidden", req.url));
         }
       }
     }
