@@ -20,6 +20,12 @@ async function main() {
     const conn = await mysql.createConnection(config);
 
     try {
+        console.log("Ensuring default company exists...");
+        await conn.execute(`
+            INSERT IGNORE INTO companies (id, code, name, status, currency_code, timezone)
+            VALUES (1, 'ROOT', 'SILETE Enterprise', 'active', 'IDR', 'Asia/Jakarta')
+        `);
+
         console.log("Creating roles...");
         const roles = [
             [1, 'SUPER_ADMIN', 'Full Access'],
@@ -57,10 +63,10 @@ async function main() {
                 [id, username, email, passHash, name]
             );
 
-            // Ensure role is assigned correctly
+            // Ensure role is assigned correctly to Company ID 1
             await conn.execute("DELETE FROM user_roles WHERE user_id = ?", [id]);
             await conn.execute(
-                "INSERT INTO user_roles (user_id, role_id, company_id) VALUES (?, ?, 0)",
+                "INSERT INTO user_roles (user_id, role_id, company_id) VALUES (?, ?, 1)",
                 [id, roleId]
             );
         }
