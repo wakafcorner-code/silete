@@ -144,15 +144,18 @@ export async function middleware(req: NextRequest) {
 
   // ─── 1. Login redirect if already authenticated ───────────────────────────
   if (pathname === "/login" && isAuthenticated) {
-    return NextResponse.redirect(new URL("/silete/dashboard", req.url));
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard"; // Next.js will auto-prefix with /silete
+    return NextResponse.redirect(url);
   }
 
   // ─── 2. Dashboard routes require authentication ───────────────────────────
   if (pathname.startsWith("/dashboard")) {
     if (!isAuthenticated) {
-      const loginUrl = new URL("/silete/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
     }
 
     // SUPER_ADMIN bypasses all permission checks
@@ -168,7 +171,10 @@ export async function middleware(req: NextRequest) {
         );
 
         if (!hasAccess) {
-          return NextResponse.redirect(new URL("/silete/login?error=forbidden", req.url));
+          const url = req.nextUrl.clone();
+          url.pathname = "/login";
+          url.searchParams.set("error", "forbidden");
+          return NextResponse.redirect(url);
         }
       }
     }
