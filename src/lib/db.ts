@@ -6,27 +6,29 @@ import path from "path";
  * Load environment variables if in standalone script environment
  */
 function ensureEnvLoaded() {
-  if (typeof process !== "undefined" && !process.env.DB_PORT && process.env.NODE_ENV !== "production") {
+  if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
     try {
       const envFiles = [".env.local", ".env"];
       for (const file of envFiles) {
         const filePath = path.join(process.cwd(), file);
         if (fs.existsSync(filePath)) {
           const content = fs.readFileSync(filePath, "utf-8");
+          console.log(`[ENV DEBUG] Force loading ${file}...`);
           for (const line of content.split("\n")) {
             const trimmed = line.trim();
             if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
               const [key, ...values] = trimmed.split("=");
-              const value = values.join("=").replace(/^["'](.*)["']$/, "$1");
-              if (!process.env[key.trim()]) {
-                process.env[key.trim()] = value;
-              }
+              const k = key.trim();
+              const v = values.join("=").replace(/^["'](.*)["']$/, "$1").trim();
+
+              // In dev, .env.local should OVERWRITE existing env vars to prevent cache issues
+              process.env[k] = v;
             }
           }
         }
       }
-    } catch {
-      // Ignore in Next.js bundle environment
+    } catch (e) {
+      console.error("[ENV DEBUG] Load failed:", e);
     }
   }
 }
@@ -48,30 +50,40 @@ export function getPool(): Pool {
 
   ensureEnvLoaded();
 
-  // Try to parse DATABASE_URL first if it exists
+  const isDev = process.env.NODE_ENV !== "production";
+
   const dbUrl = process.env.DATABASE_URL;
   let parsedConfig: any = {};
-
   if (dbUrl && dbUrl.startsWith("mysql://")) {
     try {
       const url = new URL(dbUrl);
       parsedConfig = {
         host: url.hostname,
-        port: parseInt(url.port || "3306", 10),
+        port: url.port,
         user: url.username,
         password: decodeURIComponent(url.password),
         database: url.pathname.substring(1),
       };
-    } catch (e) {
-      console.error("Failed to parse DATABASE_URL:", e);
-    }
+    } catch (e) { /* ignore */ }
   }
 
-  const host = parsedConfig.host || process.env.DB_HOST || "localhost";
-  const port = parsedConfig.port || parseInt(process.env.DB_PORT || "3306", 10);
-  const user = parsedConfig.user || process.env.DB_USER || "root";
-  const password = parsedConfig.password || process.env.DB_PASSWORD || "";
-  const database = parsedConfig.database || process.env.DB_NAME || "erp_manajemen";
+  // ROBUST LOCAL PRIORITY: FORCE ROOT IF ON LOCALHOST
+  let host     = process.env.DB_HOST     || parsedConfig.host     || "localhost";
+  let user     = process.env.DB_USER     || parsedConfig.user     || "root";
+  let password = process.env.DB_PASSWORD || (process.env.DB_PASSWORD === "" ? "" : (parsedConfig.password || ""));
+  let port     = process.env.DB_PORT     || parsedConfig.port     || (isDev ? "3307" : "3306");
+  let database = process.env.DB_NAME     || parsedConfig.database || "erp_manajemen";
+
+  if (isDev && (host === "localhost" || host === "127.0.0.1")) {
+      if (user === "erp_manajemen") {
+          user = "root";
+          password = "";
+      }
+  }
+
+  if (isDev) {
+    console.log(`[DB DEBUG] CONNECTING AS: ${user}@${host}:${port} (DB: ${database})`);
+  }
   const connectionLimit = parseInt(process.env.DB_CONNECTION_LIMIT || "10", 10);
 
   const pool = mysql.createPool({

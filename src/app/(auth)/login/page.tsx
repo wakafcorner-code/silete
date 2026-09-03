@@ -24,8 +24,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Use relative path to respect basePath /silete
-      const res = await fetch("/silete/api/auth/login", {
+      // Intelligently determine API path
+      const apiPath = window.location.pathname.includes("/silete")
+        ? "/silete/api/auth/login"
+        : "/api/auth/login";
+
+      const res = await fetch(apiPath, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier, password }),
@@ -34,7 +38,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Gagal masuk. Periksa email/username dan kata sandi Anda.");
+        throw new Error(data.error || "Gagal masuk. Periksa kembali akun Anda.");
       }
 
       // Successful login -> navigate to callbackUrl or dashboard
@@ -123,37 +127,30 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Demo Quick Logins */}
+              {/* Quick Login Buttons for Development */}
               <div className="space-y-1.5 pt-1">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold">Uji Coba Peran (Role Test Accounts):</span>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold">Gunakan Akun Demo (Klik untuk Isi Otomatis):</span>
                 <div className="flex flex-wrap gap-1.5">
                   <button
                     type="button"
-                    onClick={() => handleQuickLogin("superadmin", "SuperAdmin@123456")}
-                    className="text-[10px] px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 cursor-pointer"
+                    onClick={() => handleQuickLogin("superadmin", "Super@123")}
+                    className="text-[10px] px-2 py-1 bg-indigo-900/40 hover:bg-indigo-800/60 text-indigo-200 rounded border border-indigo-700/50 cursor-pointer transition-colors"
                   >
                     Super Admin
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleQuickLogin("finance", "Finance@123456")}
-                    className="text-[10px] px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 cursor-pointer"
+                    onClick={() => handleQuickLogin("admin", "Admin@123")}
+                    className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 cursor-pointer transition-colors"
+                  >
+                    Admin
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("finance", "Finance@123")}
+                    className="text-[10px] px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 cursor-pointer transition-colors"
                   >
                     Finance
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("warehouse", "Warehouse@123456")}
-                    className="text-[10px] px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 cursor-pointer"
-                  >
-                    Warehouse
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("viewer", "Viewer@123456")}
-                    className="text-[10px] px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 cursor-pointer"
-                  >
-                    Viewer
                   </button>
                 </div>
               </div>

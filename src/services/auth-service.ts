@@ -44,8 +44,11 @@ export async function authenticateUser(input: LoginInput): Promise<LoginResult> 
   }
 
   // 4. Verify password with bcrypt
+  console.log(`[AUTH DEBUG] Verifying password for: ${user.username}`);
   const isMatch = await verifyPassword(validated.password, user.password_hash);
+
   if (!isMatch) {
+    console.warn(`[AUTH DEBUG] Password mismatch for ${user.username}. Input: ${validated.password}, Hash: ${user.password_hash.substring(0, 10)}...`);
     throw new Error("Kredensial tidak valid: Kata sandi salah.");
   }
 

@@ -31,49 +31,35 @@ const SEED_USERS = [
     username: "superadmin",
     email: "superadmin@erp.local",
     name: "Super Administrator",
-    password: "SuperAdmin@123456",
+    password: "Super@123",
     role: "SUPER_ADMIN",
   },
   {
     username: "admin",
     email: "admin@erp.local",
     name: "System Administrator",
-    password: "Admin@123456",
+    password: "Admin@123",
     role: "ADMIN",
   },
   {
     username: "finance",
     email: "finance@erp.local",
     name: "Finance & Accounting Officer",
-    password: "Finance@123456",
+    password: "Finance@123",
     role: "FINANCE",
   },
   {
     username: "warehouse",
     email: "warehouse@erp.local",
     name: "Warehouse Manager",
-    password: "Warehouse@123456",
+    password: "Gudang@123",
     role: "WAREHOUSE",
-  },
-  {
-    username: "purchasing",
-    email: "purchasing@erp.local",
-    name: "Purchasing Staff",
-    password: "Purchasing@123456",
-    role: "PURCHASING",
-  },
-  {
-    username: "sales",
-    email: "sales@erp.local",
-    name: "Sales Executive",
-    password: "Sales@123456",
-    role: "SALES",
   },
   {
     username: "viewer",
     email: "viewer@erp.local",
     name: "Auditor & Read-Only Viewer",
-    password: "Viewer@123456",
+    password: "Viewer@123",
     role: "VIEWER",
   },
 ];
@@ -92,6 +78,28 @@ async function seed() {
   const conn = await mysql.createConnection({ host, port, user, password, database });
 
   try {
+    console.log("Ensuring roles exist...");
+    const rolesToEnsure = [
+      { id: 1, name: "SUPER_ADMIN", desc: "Full system administration" },
+      { id: 2, name: "ADMIN", desc: "System administrator" },
+      { id: 3, name: "FINANCE", desc: "Finance and accounting user" },
+      { id: 4, name: "WAREHOUSE", desc: "Warehouse and inventory user" },
+      { id: 5, name: "VIEWER", desc: "Read-only user" },
+    ];
+
+    for (const r of rolesToEnsure) {
+      await conn.query("INSERT IGNORE INTO roles (id, name, description) VALUES (?, ?, ?)", [r.id, r.name, r.desc]);
+    }
+
+    // Update SEED_DATA to use these names
+    const SEED_DATA = [
+      { username: "superadmin", email: "superadmin@erp.local", name: "Super Administrator", password: "Super@123", role: "SUPER_ADMIN" },
+      { username: "admin", email: "admin@erp.local", name: "System Administrator", password: "Admin@123", role: "ADMIN" },
+      { username: "finance", email: "finance@erp.local", name: "Finance Manager", password: "Finance@123", role: "FINANCE" },
+      { username: "warehouse", email: "warehouse@erp.local", name: "Warehouse Manager", password: "Gudang@123", role: "WAREHOUSE" },
+      { username: "viewer", email: "viewer@erp.local", name: "Auditor Viewer", password: "Viewer@123", role: "VIEWER" },
+    ];
+
     // Get roles map
     const [rolesRows] = await conn.query("SELECT id, name FROM roles");
     const roleMap = new Map<string, number>();
@@ -102,16 +110,16 @@ async function seed() {
     // Get all active companies
     const [companyRows] = await conn.query("SELECT id FROM companies WHERE status = 'active'");
     const companyIds = (companyRows as { id: number }[]).map((c) => c.id);
-    const defaultCompanyId = companyIds[0] || 1;
+    const defaultCompanyId = companyIds[0] || 0;
 
-    for (const u of SEED_USERS) {
+    for (const u of SEED_DATA) {
       const roleId = roleMap.get(u.role);
       if (!roleId) {
         console.error(`Role ${u.role} not found in database!`);
         continue;
       }
 
-      const passwordHash = await bcrypt.hash(u.password, 12);
+      const passwordHash = await bcrypt.hash(u.password, 10);
 
       // Check if user exists
       const [existing] = await conn.query<{ id: number }[] & mysql.RowDataPacket[]>(
