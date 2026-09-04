@@ -20,13 +20,7 @@ async function main() {
     const conn = await mysql.createConnection(config);
 
     try {
-        console.log("Ensuring default company exists...");
-        await conn.execute(`
-            INSERT IGNORE INTO companies (id, code, name, status, currency_code, timezone)
-            VALUES (1, 'ROOT', 'SILETE Enterprise', 'active', 'IDR', 'Asia/Jakarta')
-        `);
-
-        console.log("Creating roles...");
+        console.log("Ensuring roles exist...");
         const roles = [
             [1, 'SUPER_ADMIN', 'Full Access'],
             [2, 'ADMIN', 'Company Admin'],
@@ -38,7 +32,7 @@ async function main() {
             await conn.execute("INSERT IGNORE INTO roles (id, name, description) VALUES (?, ?, ?)", [id, name, desc]);
         }
 
-        console.log("Creating users...");
+        console.log("Creating/Updating users...");
         const users = [
             [1, 'superadmin', 'admin@erp.local', 'Super@123', 'Super Administrator', 1],
             [2, 'admin', 'store@erp.local', 'Admin@123', 'Admin Toko', 2],
@@ -51,28 +45,29 @@ async function main() {
             console.log(`Processing user: ${username}...`);
             const passHash = await bcrypt.hash(pass as string, 10);
 
-            // USE REPLACE INTO or UPDATE on duplicate to ensure password and role are correct
             await conn.execute(
                 `INSERT INTO users (id, username, email, password_hash, name, status)
                  VALUES (?, ?, ?, ?, ?, 'active')
                  ON DUPLICATE KEY UPDATE
                     password_hash = VALUES(password_hash),
-                    email = VALUES(email),
-                    name = VALUES(name),
                     status = 'active'`,
                 [id, username, email, passHash, name]
             );
 
-            // Ensure role is assigned correctly to Company ID 1
+            // Assign roles to both active companies for the primary admin accounts
+            // For this project: Company 3 (DTM) and Company 4 (STA)
+            const activeCompanies = [3, 4];
             await conn.execute("DELETE FROM user_roles WHERE user_id = ?", [id]);
-            await conn.execute(
-                "INSERT INTO user_roles (user_id, role_id, company_id) VALUES (?, ?, 1)",
-                [id, roleId]
-            );
+
+            for (const compId of activeCompanies) {
+                await conn.execute(
+                    "INSERT IGNORE INTO user_roles (user_id, role_id, company_id) VALUES (?, ?, ?)",
+                    [id, roleId, compId]
+                );
+            }
         }
 
-        console.log("SUCCESS! All accounts created.");
-        console.log("Default Password for all: [RoleName]@123 (e.g. Admin@123)");
+        console.log("SUCCESS! All accounts updated for DTM and STA entities.");
 
     } catch (err) {
         console.error("FAILED:", err);

@@ -21,6 +21,8 @@ import {
   getInventoryCompositionData
 } from "@/services/report-service";
 import { listDocumentationAttachments } from "@/services/attachment-service";
+import { getCompanyById } from "@/services/company-service";
+import { resolveCompanyScope } from "@/services/company-context-service";
 import { formatCurrency, getPublicPath } from "@/lib/utils";
 import { Camera, ArrowRight, PlusCircle, FilePlus, UserPlus } from "lucide-react";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
@@ -30,13 +32,17 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const session = await getServerSession();
-  const summary = await getExecutiveDashboardSummary(session);
-  const trendData = await getFinancialTrendData(session);
-  const inventoryData = await getInventoryCompositionData(session);
+  const activeCompanyId = await resolveCompanyScope(session);
+  const activeCompany = await getCompanyById(session, activeCompanyId);
+
+  const summary = await getExecutiveDashboardSummary(session, activeCompanyId);
+  const trendData = await getFinancialTrendData(session, activeCompanyId);
+  const inventoryData = await getInventoryCompositionData(session, activeCompanyId);
   const recentDocs = await listDocumentationAttachments(session);
   const displayDocs = recentDocs.slice(0, 4);
 
   const stats = [
+    // ... stats logic same
     {
       title: "Total Pendapatan (Revenue)",
       value: formatCurrency(summary.revenue),
@@ -123,7 +129,7 @@ export default async function DashboardPage() {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-200">
             <Building className="w-3.5 h-3.5" />
-            <span>Unit: Perusahaan #{summary.company_id}</span>
+            <span className="uppercase tracking-wide">{activeCompany?.name || `Perusahaan #${activeCompanyId}`}</span>
           </div>
         </div>
       </div>
