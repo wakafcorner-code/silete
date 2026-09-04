@@ -722,7 +722,7 @@ export default function PurchasingReceiptsPage() {
                     return (
                       <a
                         key={att.id}
-                        href={att.file_path}
+                        href={getPublicPath(att.file_path)}
                         target="_blank"
                         rel="noreferrer"
                         className="group relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200 hover:border-indigo-500 transition-all shadow-sm"

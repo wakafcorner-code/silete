@@ -391,14 +391,14 @@ export async function listMovements(
                 LEFT JOIN purchase_orders po ON gr.purchase_order_id = po.id
                 LEFT JOIN suppliers s_po ON po.supplier_id = s_po.id
                 LEFT JOIN suppliers s_gr ON gr.supplier_id = s_gr.id
-                WHERE gr.id = it.reference_id
+                WHERE gr.id = it.reference_id AND gr.company_id = it.company_id
                 LIMIT 1
               )
               WHEN it.reference_type = 'delivery_order' THEN (
                 SELECT c.name FROM deliveries d
                 JOIN sales_orders so ON d.sales_order_id = so.id
                 JOIN customers c ON so.customer_id = c.id
-                WHERE d.id = it.reference_id
+                WHERE d.id = it.reference_id AND d.company_id = it.company_id
                 LIMIT 1
               )
               ELSE NULL
