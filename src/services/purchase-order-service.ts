@@ -32,6 +32,7 @@ const PurchaseItemInputSchema = z.object({
 
 export const PurchaseOrderSchema = z.object({
   supplier_id: z.number().int().positive("Supplier wajib dipilih"),
+  purchase_request_id: z.number().int().positive().optional().nullable(),
   branch_id: z.number().int().positive().optional().nullable(),
   po_no: z.string().min(3).max(50),
   order_date: z.string().min(1), // "YYYY-MM-DD"
@@ -135,12 +136,13 @@ export async function createPurchaseOrder(
     // 1. Insert header
     const [headerRes] = await conn.execute<import("mysql2").ResultSetHeader>(
       `INSERT INTO purchase_orders
-         (company_id, supplier_id, branch_id, po_no, order_date, expected_date,
+         (company_id, supplier_id, purchase_request_id, branch_id, po_no, order_date, expected_date,
           status, subtotal, tax_amount, total_amount, notes, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?)`,
       [
         companyId,
         validated.supplier_id,
+        validated.purchase_request_id ?? null,
         validated.branch_id ?? null,
         validated.po_no,
         validated.order_date,

@@ -62,9 +62,11 @@ export default function PurchaseOrdersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [purchaseRequests, setPurchaseRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
+  const [loadingPr, setLoadingPr] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,6 +77,7 @@ export default function PurchaseOrdersPage() {
     order_date: today,
     expected_date: "",
     supplier_id: "",
+    purchase_request_id: "",
     branch_id: "",
     notes: "",
     items: [
@@ -92,22 +95,25 @@ export default function PurchaseOrdersPage() {
         ...(statusFilter !== "all" ? { status: statusFilter } : {}),
       });
 
-      const [oRes, sRes, bRes, pRes] = await Promise.all([
+      const [oRes, sRes, bRes, pRes, prRes] = await Promise.all([
         fetch(`/silete/api/purchasing/orders?${queryParams.toString()}`),
         fetch("/silete/api/suppliers?limit=100"),
         fetch("/silete/api/branches"),
         fetch("/silete/api/products?limit=100"),
+        fetch("/silete/api/purchasing/requests?status=approved&limit=50"),
       ]);
 
       const oData = await oRes.json();
       const sData = await sRes.json();
       const bData = await bRes.json();
       const pData = await pRes.json();
+      const prData = await prRes.json();
 
       if (oData.success) setOrders(oData.data || []);
       if (sData.success) setSuppliers(sData.data || []);
       if (bData.success) setBranches(bData.branches || bData.data || []);
       if (pData.success) setProducts(pData.data || []);
+      if (prData.success) setPurchaseRequests(prData.data || []);
     } catch {
       toast("error", "Gagal memuat data Purchase Order");
     } finally {
@@ -125,6 +131,7 @@ export default function PurchaseOrdersPage() {
       order_date: today,
       expected_date: "",
       supplier_id: suppliers[0]?.id.toString() || "",
+      purchase_request_id: "",
       branch_id: "",
       notes: "",
       items: [{ product_id: products[0]?.id.toString() || "", quantity: "1", unit_price: products[0]?.cost_price || "0", tax_rate: "11" }],
@@ -164,6 +171,35 @@ export default function PurchaseOrdersPage() {
       }
       return { ...p, items: newItems };
     });
+  };
+
+  const handlePullPR = async () => {
+    if (!form.purchase_request_id) return;
+    setLoadingPr(true);
+    try {
+      const res = await fetch(`/silete/api/purchasing/requests/${form.purchase_request_id}`);
+      const data = await res.json();
+      if (data.success && data.data) {
+        const pr = data.data;
+        const prItems = pr.items || [];
+        setForm((prev) => ({
+          ...prev,
+          branch_id: String(pr.branch_id || ""),
+          notes: `Ditarik dari PR #${pr.request_no}. ${pr.notes || ""}`,
+          items: prItems.map((it: any) => ({
+            product_id: String(it.product_id),
+            quantity: String(it.quantity),
+            unit_price: String(it.cost_price || 0),
+            tax_rate: "11",
+          })),
+        }));
+        toast("success", `Data ditarik dari PR #${pr.request_no}`);
+      }
+    } catch (err) {
+      toast("error", "Gagal menarik data PR");
+    } finally {
+      setLoadingPr(false);
+    }
   };
 
   const calculateTotals = () => {
@@ -477,18 +513,47 @@ export default function PurchaseOrdersPage() {
                 onChange={(e) => setForm((p) => ({ ...p, po_no: e.target.value }))}
               />
             </FormField>
-            <FormField label="Pemasok / Supplier" required error={errors.supplier_id}>
-              <Select
-                value={form.supplier_id}
-                onChange={(e) => setForm((p) => ({ ...p, supplier_id: e.target.value }))}
-              >
-                <option value="">-- Pilih Supplier --</option>
-                {suppliers.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
-                ))}
-              </Select>
+            <FormField label="Tarik dari Permintaan (PR)">
+              <div className="flex gap-2">
+                <Select
+                  value={form.purchase_request_id}
+                  onChange={(e) => setForm({ ...form, purchase_request_id: e.target.value })}
+                  className="flex-1"
+                >
+                  <option value="">— Buat Manual (Tanpa PR) —</option>
+                  {purchaseRequests.map((pr) => (
+                    <option key={pr.id} value={pr.id}>
+                      {pr.request_no} ({pr.requested_by_name})
+                    </option>
+                  ))}
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePullPR}
+                  disabled={!form.purchase_request_id || loadingPr}
+                  className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 shrink-0 h-9 px-3"
+                  title="Tarik item dari PR"
+                >
+                  {loadingPr ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+                  <span className="ml-1.5 text-[10px]">Tarik PR</span>
+                </Button>
+              </div>
             </FormField>
           </div>
+
+          <FormField label="Pemasok / Supplier" required error={errors.supplier_id}>
+            <Select
+              value={form.supplier_id}
+              onChange={(e) => setForm((p) => ({ ...p, supplier_id: e.target.value }))}
+            >
+              <option value="">-- Pilih Supplier --</option>
+              {suppliers.map((s) => (
+                <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
+              ))}
+            </Select>
+          </FormField>
 
           <div className="grid grid-cols-3 gap-3">
             <FormField label="Tanggal Pesanan" required error={errors.order_date}>

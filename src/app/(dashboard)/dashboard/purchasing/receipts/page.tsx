@@ -71,6 +71,7 @@ export default function PurchasingReceiptsPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<{receipt: GoodsReceipt, items: any[], attachments: any[]} | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [loadingPo, setLoadingPo] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({
@@ -158,6 +159,34 @@ export default function PurchasingReceiptsPage() {
       }
       return { ...prev, items: copy };
     });
+  };
+
+  const handlePullPO = async () => {
+    if (!form.purchase_order_id) return;
+    setLoadingPo(true);
+    try {
+      const res = await fetch(`/silete/api/purchasing/orders/${form.purchase_order_id}`);
+      const data = await res.json();
+      if (data.success && data.order) {
+        const po = data.order;
+        const poItems = data.items || [];
+        setForm((prev) => ({
+          ...prev,
+          supplier_id: String(po.supplier_id || ""),
+          notes: `Penerimaan barang dari PO #${po.po_no}. ${po.notes || ""}`,
+          items: poItems.map((it: any) => ({
+            product_id: String(it.product_id),
+            quantity: String(it.quantity),
+            unit_cost: String(it.unit_price),
+          })),
+        }));
+        toast("success", `Data ditarik dari PO #${po.po_no}`);
+      }
+    } catch (err) {
+      toast("error", "Gagal menarik data PO");
+    } finally {
+      setLoadingPo(false);
+    }
   };
 
   const validate = () => {
@@ -511,17 +540,32 @@ export default function PurchasingReceiptsPage() {
 
           <div className="grid grid-cols-1 gap-3">
             <FormField label="Tautan Pesanan Beli (PO Opsional)">
-              <Select
-                value={form.purchase_order_id}
-                onChange={(e) => setForm({ ...form, purchase_order_id: e.target.value })}
-              >
-                <option value="">— Penerimaan Langsung (Tanpa PO) —</option>
-                {purchaseOrders.map((po) => (
-                  <option key={po.id} value={po.id}>
-                    {po.po_no} {po.supplier_name ? `(${po.supplier_name})` : ""}
-                  </option>
-                ))}
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  value={form.purchase_order_id}
+                  onChange={(e) => setForm({ ...form, purchase_order_id: e.target.value })}
+                  className="flex-1"
+                >
+                  <option value="">— Penerimaan Langsung (Tanpa PO) —</option>
+                  {purchaseOrders.map((po) => (
+                    <option key={po.id} value={po.id}>
+                      {po.po_no} {po.supplier_name ? `(${po.supplier_name})` : ""}
+                    </option>
+                  ))}
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePullPO}
+                  disabled={!form.purchase_order_id || loadingPo}
+                  className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 shrink-0 h-9 px-3"
+                  title="Tarik item dari PO"
+                >
+                  {loadingPo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+                  <span className="ml-1.5">Tarik Item</span>
+                </Button>
+              </div>
             </FormField>
           </div>
 

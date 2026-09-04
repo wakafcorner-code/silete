@@ -237,12 +237,22 @@ export async function listPurchaseRequests(
 }
 
 /**
- * Get Purchase Request by ID.
+ * Get Purchase Request by ID with items.
  */
 export async function getPurchaseRequestById(
   session: UserSessionPayload | null,
   requestId: number
-): Promise<PurchaseRequest | null> {
+): Promise<(PurchaseRequest & { items: any[] }) | null> {
   requirePermission(session, PERMISSIONS.PURCHASING_VIEW);
-  return assertPurchaseRequestAccess(session, requestId);
+  const pr = await assertPurchaseRequestAccess(session, requestId);
+
+  const items = await query<any[]>(
+    `SELECT pri.*, p.name AS product_name, p.sku AS product_sku, p.unit AS product_unit, p.cost_price
+     FROM purchase_request_items pri
+     JOIN products p ON pri.product_id = p.id
+     WHERE pri.purchase_request_id = ?`,
+    [requestId]
+  );
+
+  return { ...pr, items };
 }
