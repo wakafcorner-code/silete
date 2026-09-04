@@ -103,9 +103,9 @@ export function SupplierInvoiceDialog({
     try {
       const res = await fetch(`/silete/api/purchasing/orders/${id}`);
       const data = await res.json();
-      if (data.success && data.order) {
-        const po = data.order;
-        const poItems = po.items || [];
+      if (data.success && data.data) {
+        const po = data.data.order;
+        const poItems = data.data.items || [];
         setForm({
           ...form,
           supplier_id: String(po.supplier_id || ""),
@@ -133,9 +133,9 @@ export function SupplierInvoiceDialog({
     try {
       const res = await fetch(`/silete/api/inventory/receiving/${id}`);
       const data = await res.json();
-      if (data.success && data.receipt) {
-        const grn = data.receipt;
-        const grnItems = data.items || [];
+      if (data.success && data.data) {
+        const grn = data.data.receipt;
+        const grnItems = data.data.items || [];
         setForm({
           ...form,
           supplier_id: String(grn.supplier_id || ""),
@@ -210,9 +210,9 @@ export function SupplierInvoiceDialog({
     try {
       const res = await fetch(`/silete/api/inventory/receiving/${selectedGrnId}`);
       const data = await res.json();
-      if (data.success && data.receipt) {
-        const grn = data.receipt;
-        const grnItems = data.items || [];
+      if (data.success && data.data) {
+        const grn = data.data.receipt;
+        const grnItems = data.data.items || [];
 
         // Auto-fill form
         setForm({
@@ -243,9 +243,9 @@ export function SupplierInvoiceDialog({
     try {
       const res = await fetch(`/silete/api/purchasing/orders/${selectedPoId}`);
       const data = await res.json();
-      if (data.success && data.order) {
-        const po = data.order;
-        const poItems = po.items || [];
+      if (data.success && data.data) {
+        const po = data.data.order;
+        const poItems = data.data.items || [];
 
         setForm({
           ...form,
@@ -398,9 +398,10 @@ export function SupplierInvoiceDialog({
             <thead className="bg-slate-50 border-b">
               <tr>
                 <th className="p-2 text-left">Deskripsi / Produk</th>
-                <th className="p-2 text-right w-20">Qty</th>
-                <th className="p-2 text-right w-32">Harga Satuan</th>
-                <th className="p-2 text-right w-32">Subtotal</th>
+                <th className="p-2 text-right w-16">Qty</th>
+                <th className="p-2 text-right w-28">Harga Satuan</th>
+                <th className="p-2 text-right w-24">Pajak (Rp)</th>
+                <th className="p-2 text-right w-28">Subtotal</th>
                 <th className="p-2 w-10"></th>
               </tr>
             </thead>
@@ -443,8 +444,20 @@ export function SupplierInvoiceDialog({
                       className="h-8 text-right"
                     />
                   </td>
+                  <td className="p-2">
+                    <Input
+                      type="number"
+                      value={it.tax_amount}
+                      onChange={e => {
+                        const items = [...form.items];
+                        items[idx].tax_amount = e.target.value;
+                        setForm({...form, items});
+                      }}
+                      className="h-8 text-right"
+                    />
+                  </td>
                   <td className="p-2 text-right font-mono font-bold">
-                    {formatCurrency(Number(it.quantity) * Number(it.unit_price))}
+                    {formatCurrency((Number(it.quantity) * Number(it.unit_price)) + Number(it.tax_amount))}
                   </td>
                   <td className="p-2">
                     <Button
@@ -465,7 +478,11 @@ export function SupplierInvoiceDialog({
         <div className="flex justify-end gap-10 p-3 bg-slate-50 rounded-lg border">
           <div className="text-right space-y-1">
             <p className="text-[10px] text-slate-500 uppercase font-bold">Subtotal</p>
-            <p className="text-sm font-bold text-slate-900">{formatCurrency(subtotal)}</p>
+            <p className="text-xs font-bold text-slate-900">{formatCurrency(subtotal)}</p>
+          </div>
+          <div className="text-right space-y-1">
+            <p className="text-[10px] text-slate-500 uppercase font-bold">Total Pajak</p>
+            <p className="text-xs font-bold text-slate-900">{formatCurrency(totalTax)}</p>
           </div>
           <div className="text-right space-y-1">
             <p className="text-[10px] text-slate-500 uppercase font-bold">Total Tagihan</p>
