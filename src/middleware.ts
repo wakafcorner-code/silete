@@ -142,15 +142,20 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // Helper to check if path starts with prefix, accounting for potential /silete base path
+  const matchesPath = (path: string, target: string) => {
+    return path.startsWith(target) || path.startsWith(`/silete${target}`);
+  };
+
   // ─── 1. Login redirect if already authenticated ───────────────────────────
-  if (pathname === "/login" && isAuthenticated) {
+  if (matchesPath(pathname, "/login") && isAuthenticated) {
     const url = req.nextUrl.clone();
-    url.pathname = "/dashboard"; // Next.js will auto-prefix with /silete
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
   // ─── 2. Dashboard routes require authentication ───────────────────────────
-  if (pathname.startsWith("/dashboard")) {
+  if (matchesPath(pathname, "/dashboard")) {
     if (!isAuthenticated) {
       const url = req.nextUrl.clone();
       url.pathname = "/login";
@@ -161,7 +166,7 @@ export async function middleware(req: NextRequest) {
     // SUPER_ADMIN bypasses all permission checks
     if (!payload?.roles?.includes("SUPER_ADMIN")) {
       const matchedRule = ROUTE_PERMISSION_MAP.find((rule) =>
-        pathname.startsWith(rule.prefix)
+        matchesPath(pathname, rule.prefix)
       );
 
       if (matchedRule) {
@@ -181,11 +186,11 @@ export async function middleware(req: NextRequest) {
   }
 
   // ─── 3. Protected API routes ──────────────────────────────────────────────
-  if (pathname.startsWith("/api/")) {
+  if (matchesPath(pathname, "/api/")) {
     const isPublicApi =
-      pathname.startsWith("/api/auth/login") ||
-      pathname.startsWith("/api/auth/logout") ||
-      pathname.startsWith("/api/health");
+      matchesPath(pathname, "/api/auth/login") ||
+      matchesPath(pathname, "/api/auth/logout") ||
+      matchesPath(pathname, "/api/health");
 
     if (!isPublicApi && !isAuthenticated) {
       return NextResponse.json(
