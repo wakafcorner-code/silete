@@ -164,7 +164,10 @@ export async function middleware(req: NextRequest) {
     }
 
     // SUPER_ADMIN bypasses all permission checks
-    if (!payload?.roles?.includes("SUPER_ADMIN")) {
+    const roles = payload?.roles || [];
+    const isSuperAdmin = roles.includes("SUPER_ADMIN");
+
+    if (!isSuperAdmin) {
       const matchedRule = ROUTE_PERMISSION_MAP.find((rule) =>
         matchesPath(pathname, rule.prefix)
       );
@@ -176,6 +179,7 @@ export async function middleware(req: NextRequest) {
         );
 
         if (!hasAccess) {
+          console.warn(`[AUTH] Access Denied for ${payload?.username} on ${pathname}`);
           const url = req.nextUrl.clone();
           url.pathname = "/login";
           url.searchParams.set("error", "forbidden");
