@@ -81,9 +81,8 @@ export function getPool(): Pool {
       }
   }
 
-  if (isDev) {
-    console.log(`[DB DEBUG] CONNECTING AS: ${user}@${host}:${port} (DB: ${database})`);
-  }
+  console.log(`[DB INFO] Pool initializing for ${user}@${host}:${port} (DB: ${database})`);
+
   const connectionLimit = parseInt(process.env.DB_CONNECTION_LIMIT || "10", 10);
 
   const pool = mysql.createPool({
