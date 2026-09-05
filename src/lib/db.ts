@@ -74,6 +74,14 @@ export function getPool(): Pool {
   let port     = process.env.DB_PORT     || parsedConfig.port     || (isDev ? "3307" : "3306");
   let database = process.env.DB_NAME     || parsedConfig.database || "erp_manajemen";
 
+  // Production Emergency Fallback
+  if (!isDev && !dbUrl) {
+      host = "127.0.0.1";
+      user = "erp_manajemen";
+      password = "Mdwz4HCFzzKAz6Ah";
+      port = "3306";
+  }
+
   if (isDev && (host === "localhost" || host === "127.0.0.1")) {
       if (user === "erp_manajemen") {
           user = "root";
