@@ -142,13 +142,17 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Helper to check if path starts with prefix, accounting for potential /silete base path
+  // Helper to check if path matches target, accounting for Next.js stripping basePath
   const matchesPath = (path: string, target: string) => {
     return path.startsWith(target) || path.startsWith(`/silete${target}`);
   };
 
   // ─── 1. Login redirect if already authenticated ───────────────────────────
   if (matchesPath(pathname, "/login") && isAuthenticated) {
+    // If we have a forbidden error, don't redirect back to dashboard to avoid loop
+    if (req.nextUrl.searchParams.get("error") === "forbidden") {
+      return NextResponse.next();
+    }
     const url = req.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -167,24 +171,28 @@ export async function middleware(req: NextRequest) {
     const roles = payload?.roles || [];
     const isSuperAdmin = roles.includes("SUPER_ADMIN");
 
-    if (!isSuperAdmin) {
-      const matchedRule = ROUTE_PERMISSION_MAP.find((rule) =>
-        matchesPath(pathname, rule.prefix)
+    if (isSuperAdmin) {
+      return NextResponse.next();
+    }
+
+    // Check specific route permissions
+    const matchedRule = ROUTE_PERMISSION_MAP.find((rule) =>
+      matchesPath(pathname, rule.prefix)
+    );
+
+    if (matchedRule) {
+      const userPerms: string[] = payload?.permissions ?? [];
+      const hasAccess = matchedRule.permissions.some((p) =>
+        userPerms.includes(p)
       );
 
-      if (matchedRule) {
-        const userPerms: string[] = payload?.permissions ?? [];
-        const hasAccess = matchedRule.permissions.some((p) =>
-          userPerms.includes(p)
-        );
-
-        if (!hasAccess) {
-          console.warn(`[AUTH] Access Denied for ${payload?.username} on ${pathname}`);
-          const url = req.nextUrl.clone();
-          url.pathname = "/login";
-          url.searchParams.set("error", "forbidden");
-          return NextResponse.redirect(url);
-        }
+      if (!hasAccess) {
+        console.warn(`[AUTH] Forbidden: ${payload?.username} lacks permissions for ${pathname}`);
+        const url = req.nextUrl.clone();
+        url.pathname = "/login";
+        url.searchParams.set("error", "forbidden");
+        url.searchParams.set("from", pathname);
+        return NextResponse.redirect(url);
       }
     }
   }
